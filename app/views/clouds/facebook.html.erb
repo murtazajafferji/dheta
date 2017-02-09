@@ -1,0 +1,344 @@
+
+<% content_for :head do %>
+  <title>HTML5 Word Cloud</title>
+
+  <meta name="apple-mobile-web-app-title" content="Word Cloud">
+  <link rel="apple-touch-icon-precomposed" href="/word_cloud/assets/images/wordcloud-logo.png" />
+
+  <meta name="description" content="Get the most frequent terms in an tag cloud representation, powered by HTML5.">
+  <meta property="og:description" content="Get the most frequent terms in an tag cloud representation, powered by HTML5." />
+
+  <!-- Unfortunately we need to hard-code these in HTML -->
+  <meta property="og:url" content="http://timdream.org/wordcloud/" />
+  <meta property="og:title" content="HTML5 Word Cloud" />
+  <meta property="fb:admins" content="541998202" />
+  <meta property="fb:app_id" content="336016770126298" /><!-- Set correctly -->
+
+  <meta property="og:image" content="http://timdream.org/wordcloud/assets/images/wordcloud-logo.png" />
+  <meta property="og:image:width" content="432" />
+  <meta property="og:image:height" content="432" />
+  <meta property="og:image" content="http://timdream.org/wordcloud/assets/images/wordcloud-logo-128.png" />
+  <meta property="og:image:width" content="128" />
+  <meta property="og:image:height" content="128" />
+  <meta property="og:image" content="http://timdream.org/wordcloud/assets/images/wordcloud-logo-75.png" />
+  <meta property="og:image:width" content="75" />
+  <meta property="og:image:height" content="75" />
+  <meta property="og:image" content="http://timdream.org/wordcloud/assets/images/wordcloud-logo-16.png" />
+  <meta property="og:image:width" content="16" />
+  <meta property="og:image:height" content="16" />
+
+  <link rel="shortcut icon" href="./favicon.ico" />
+
+  <link rel="stylesheet" type="text/css" href="/word_cloud/assets/first-screen.css">
+  <!-- Le styles -->
+  <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/word_cloud/assets/wordcloud.css">
+
+  <link rel="prefetch" type="application/l10n" href="/word_cloud/locales/locales.ini?_=@@timestamp" />
+
+  <link rel="payment" href="https://flattr.com/submit/auto?url=https%3A%2F%2Fgithub.com%2Ftimdream%2Fwordcloud&amp;user_id=timdream" type="text/html" />
+
+  <!-- For browser without Web Workers support, run the calculation
+       on the main event loop with the worker script. -->
+  <%= javascript_include_tag "/word_cloud/assets/lib/wordfreq/src/wordfreq.worker.js?_=@@timestamp" , defer: 'defer' %>
+
+  <!-- build:js assets/app.min.js -->
+  <%= javascript_include_tag "/word_cloud/assets/vars.js" %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/web-l10n/l10n.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/wordfreq/src/wordfreq.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/wordcloud2.js/src/wordcloud2.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/app.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/views.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/canvas-view.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/source-dialog-view.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/dashboard-view.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/sharer-dialog-view.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/panels.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/fetchers.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/start.js" , defer: 'defer' %>
+  <!-- endbuild -->
+
+<% end %>
+
+<div id="dheta-text" style="display: none;"><%= @text %></div>
+<div id="wc-canvas-container">
+  <div id="wc-canvas">
+    <canvas id="wc-canvas-canvas"></canvas>
+    <div id="wc-canvas-hover" hidden>
+      <span id="wc-canvas-hover-label" data-l10n-id="hover-count"></span>
+    </div>
+  </div>
+</div>
+
+<div id="wc-loading">
+  <div class="wc-icon" lang="en">
+    <span class="wc-icon-cloud"></span>
+  </div>
+  <div id="wc-loading-label" class="lead"></div>
+</div>
+
+<div id="wc-source-dialog" class="modal" hidden>
+  <div class="modal-header clearfix">
+    <h3 data-l10n-id="source-dialog-title" id="wc-source-title" class="pull-left"></h3>
+    <div class="pull-right">
+      <select id="wc-source-selection" class="input-medium"></select>
+      <button data-l10n-id="source-dialog-about-btn" id="wc-source-about-btn" class="btn btn-info"></button>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span3 tabbable tabs-left">
+        <ul id="wc-source-menu" class="nav nav-tabs">
+          <li hidden>
+            <a href="#" data-l10n-id="source-example" data-panel="example"></a>
+          </li>
+
+          <li hidden>
+            <a href="#" data-l10n-id="source-wikipedia" data-panel="wikipedia"></a></li>
+
+          <li hidden>
+            <a href="#" data-l10n-id="source-googleplus" data-panel="googleplus"></a></li>
+
+          <li hidden>
+            <a href="#" data-l10n-id="source-cp" data-panel="cp"></a></li>
+          <li hidden>
+            <a href="#" data-l10n-id="source-file" data-panel="file"></a></li>
+        </ul>
+      </div>
+      <div id="wc-source-panels" class="span9">
+
+        <form id="wc-panel-example" hidden>
+          <div id="wc-panel-example-support-msg" class="alert alert-block alert-warning" hidden>
+            <h4 data-l10n-id="browser-partial-support-title"></h4>
+            <span data-l10n-id="browser-partial-support-message"></span>
+          </div>
+
+          <div class="alert alert-block alert-info only-en-US">
+            <h4>How can I get my own world cloud?</h4>
+            <p>Unfortunately, Google and Facebook has closed their API services.
+Word Cloud can no longer access your data without these services.</p>
+            <p>In the meantime, you could supply text or file directly on the left.
+There is also a <a href="http://timdream.org/wordcloud2.js/">page</a> available for fine-grain control.</p>
+          </div>
+
+          <div class="alert alert-block alert-info only-zh-TW">
+            <h4>如何製作我自己的文字雲？</h4>
+            <p>很遺憾的，Google 和 Facebook 關閉了文字雲需要的 API 服務。文字雲無法直接抓取您的資料。</p>
+            <p>您可以改使用右方的選項直接提供文字或檔案給文字雲。<a href="http://timdream.org/wordcloud2.js/">有另一個網頁</a>可以提供進階使用者自訂文字雲。</p>
+          </div>
+
+          <label class="radio only-en-US">
+            <input type="radio" name="example"
+              value="wikipedia:Cloud">
+            <span data-l10n-id="panel-example-wikipedia-cloud"></span>
+          </label>
+          <label class="radio only-zh-TW">
+            <input type="radio" name="example"
+              value="wikipedia.zh:雲">
+            <span data-l10n-id="panel-example-wikipedia-zh-cloud"></span>
+          </label>
+
+          <div id="wc-psm" hidden></div>
+        </form>
+
+        <form id="wc-panel-wikipedia" hidden>
+          <label data-l10n-id="panel-wikipedia" for="wc-panel-wikipedia-title"></label>
+          <input type="text" id="wc-panel-wikipedia-title" class="input-medium" />
+        </form>
+
+        <form id="wc-panel-cp" hidden>
+          <label data-l10n-id="panel-cp-label" for="wc-panel-cp-textarea"></label>
+          <textarea id="wc-panel-cp-textarea" class="input-block-level" rows="10"></textarea>
+          <span data-l10n-id="panel-cp-help" class="help-block"></span>
+        </form>
+
+        <form id="wc-panel-file" hidden>
+          <label data-l10n-id="panel-file-label" for="wc-panel-file-file"></label>
+          <a class="btn file-wrapper">
+            <span data-l10n-id="panel-file-browse"></span>
+            <input type="file" accept="text/plain" id="wc-panel-file-file">
+          </a><span data-l10n-id="n-file-selected" data-l10n-args='{ "n": 0 }' id="wc-panel-file-file-label"></span>
+          <span data-l10n-id="panel-file-help" class="help-block"></span>
+          <label data-l10n-id="panel-file-encoding" for="wc-panel-file-encoding"></label>
+          <input type="text" id="wc-panel-file-encoding" value="UTF-8">
+          <span data-l10n-id="panel-file-encoding-help" class="help-block"></span>
+        </form>
+
+        <form id="wc-panel-googleplus" hidden>
+          <label data-l10n-id="panel-googleplus-label" for="wc-panel-googleplus-id"></label>
+          <div class="input-prepend">
+            <span class="add-on">https://plus.google.com/</span>
+            <input type="text" id="wc-panel-googleplus-id" class="input-medium" placeholder="me" />
+          </div>
+          <span data-l10n-id="panel-googleplus-help" class="help-block"></span>
+          <p id="wc-panel-googleplus-status" data-l10n-id="loading"></p>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+
+    <div data-l10n-id="language-title" class="input-prepend pull-left" title="Language">
+      <span class="add-on"><i class="icon-globe"></i></span>
+      <select id="wc-language" class="input-small">
+        <option value="en-US" selected>English</option>
+        <option value="zh-TW">正體中文</option>
+      </select>
+    </div>
+
+    <button data-l10n-id="source-dialog-start-btn" id="wc-source-start-btn" class="btn btn-primary"></button>
+  </div>
+</div>
+
+<div id="wc-dashboard" hidden>
+  <div class="container">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="btn-group">
+          <button data-l10n-id="dashboard-back-btn" data-action="back" class="btn" title="Back"><i class="icon-chevron-left"></i><span data-l10n-id="dashboard-back-span"></span></button>
+        </div>
+
+        <div class="btn-group">
+          <button data-l10n-id="dashboard-refresh-btn" data-canvas-ctl data-action="refresh" class="btn disabled hide-label" title="Refresh"><i class="icon-refresh"></i><span data-l10n-id="dashboard-refresh-span"></span></button>
+          <button data-l10n-id="dashboard-theme-btn" data-canvas-ctl data-action="theme" class="btn disabled" title="Switch Theme"><i class="icon-gift"></i><span data-l10n-id="dashboard-theme-span"></span></button>
+          <button data-l10n-id="dashboard-shape-btn" data-canvas-ctl data-action="shape" class="btn disabled" title="Switch Shape"><i class="icon-star"></i><span data-l10n-id="dashboard-shape-span"></span></button>
+          <button data-l10n-id="dashboard-list-btn" data-canvas-ctl data-action="edit" class="btn disabled" title="Edit List"><i class="icon-edit"></i><span data-l10n-id="dashboard-list-span"></span></button>
+        </div>
+
+        <div class="btn-group">
+          <button data-l10n-id="dashboard-enlarge-btn" data-canvas-ctl data-action="size+" class="btn disabled hide-label" title="Enlarge"><i class="icon-font"></i><span data-l10n-id="dashboard-enlarge-span"></span></button>
+          <button data-l10n-id="dashboard-shrink-btn" data-canvas-ctl data-action="size-" class="btn disabled hide-label" title="Shrink"><i class="icon-font smaller-icon"></i><span data-l10n-id="dashboard-shrink-span"></span></button>
+        </div>
+
+        <div class="btn-group">
+          <button data-l10n-id="dashboard-disperse-btn" data-canvas-ctl data-action="gap+" class="btn disabled hide-label" title="Disperse"><i class="icon-resize-full"></i><span data-l10n-id="dashboard-disperse-span"></span></button>
+          <button data-l10n-id="dashboard-gather-up-btn" data-canvas-ctl data-action="gap-" class="btn disabled hide-label" title="Gather Up"><i class="icon-resize-small"></i><span data-l10n-id="dashboard-gather-up-span"></span></button>
+        </div>
+
+        <div class="pull-right">
+
+          <div class="btn-group">
+            <a data-l10n-id="dashboard-save-disk-btn" data-canvas-ctl download="wordcloud.png" href="#" data-action="save" class="btn disabled" title="Save to disk"><i class="icon-hdd"></i><span data-l10n-id="dashboard-save-disk-span"></span></a>
+          </div>
+
+          <div class="btn-group">
+            <button data-l10n-id="dashboard-share-btn" data-canvas-ctl data-action="share" class="btn disabled btn-primary" title="Share"><i class="icon-share"></i><span data-l10n-id="dashboard-share-span"</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="wc-list-dialog" class="modal" hidden>
+  <div class="modal-body">
+    <label data-l10n-id="list-dialog-label" for="wc-list-edit"></label>
+      <textarea id="wc-list-edit" class="input-block-level" rows="14"></textarea>
+      <span data-l10n-id="list-dialog-help" class="help-block"></span>
+  </div>
+  <div class="modal-footer">
+    <button data-l10n-id="list-dialog-cancel-btn" id="wc-list-cancel-btn" class="btn"></button>
+    <button data-l10n-id="list-dialog-confirm-btn" id="wc-list-confirm-btn" class="btn btn-primary"></button>
+  </div>
+</div>
+
+<div id="wc-sharer-dialog" class="modal" hidden>
+  <div class="modal-header">
+    <h3 id="wc-sharer-title" data-l10n-id="share-dialog-title"></h3>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span4">
+        <a class="thumbnail" id="wc-sharer-img-link" target="_blank" hidden>
+          <img id="wc-sharer-img" />
+        </a>
+        <p data-l10n-id="share-dialog-terms"></p>
+        <p class="well well-small" id="wc-sharer-terms"></p>
+        <p data-l10n-id="share-dialog-hashtag"></p>
+        <p class="well well-small" id="wc-sharer-hashtag"></p>
+      </div>
+      <div class="span8">
+        <input type="text" data-l10n-id="share-dialog-title-input" id="wc-sharer-title-input" class="input-block-level" />
+        <textarea id="wc-sharer-desc" class="input-block-level"  data-l10n-id="share-dialog-desc-input" rows="5"></textarea>
+
+        <div class="progress progress-striped active">
+          <div class="bar" id="wc-sharer-progress"></div>
+        </div>
+
+        <p data-l10n-id="cors-description"></p>
+
+        <p class="wc-sharer-service">
+          <span class="wc-sharer-service-title"><i class="favicons-imgur"></i>Imgur</span>
+          <a target="_blank" id="wc-sharer-imgur-status" class="disabled" data-l10n-id="loading"></a>
+        </p>
+
+        <p class="wc-sharer-service">
+          <span class="wc-sharer-service-title"><i class="favicons-facebook"></i>Facebook</span>
+          <a target="_blank" id="wc-sharer-facebook-status" class="disabled" data-l10n-id="loading"></a>
+        </p>
+
+        <p class="wc-sharer-service">
+          <span class="wc-sharer-service-title"><i class="favicons-tumblr"></i>Tumblr</span>
+          <a target="_blank" id="wc-sharer-tumblr-status" class="disabled" data-l10n-id="loading"></a>
+        </p>
+
+        <p class="wc-sharer-service">
+          <span class="wc-sharer-service-title"><i class="favicons-twitter"></i>Twitter</span>
+          <a target="_blank" id="wc-sharer-twitter-status" class="disabled" data-l10n-id="loading"></a>
+        </p>
+
+        <p class="wc-sharer-service">
+          <span class="wc-sharer-service-title"><i class="favicons-plurk"></i>Plurk</span>
+          <a target="_blank" id="wc-sharer-plurk-status" class="disabled" data-l10n-id="loading"></a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button data-l10n-id="share-dialog-reupload-btn" id="wc-sharer-reupload-btn" class="btn"></button>
+    <button data-l10n-id="share-dialog-done-btn" id="wc-sharer-done-btn" class="btn btn-primary">Done</button>
+  </div>
+</div>
+
+<div id="wc-about-dialog" class="modal" hidden>
+  <div class="modal-header">
+    <h3 data-l10n-id="about-dialog-title" id="wc-about-title"></h3>
+  </div>
+  <div class="modal-body">
+    <div id="wc-about-icon" class="well">
+      <div class="wc-icon" lang="en">
+        <span class="wc-icon-cloud"></span>
+      </div>
+    </div>
+    <div id="wc-about-content">...</div>
+    <div id="wc-about-donate" hidden>
+      <h3 data-l10n-id="donate"></h3>
+      <p data-l10n-id="donate-desc"></p>
+      <div id="wc-about-donate-content"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button data-l10n-id="about-dialog-close-btn" id="wc-about-close-btn" class="btn btn-primary"></button>
+  </div>
+</div>
+
+<div id="wc-sns-push" hidden>
+  <div class="button" id="wc-sns-facebook">
+    <iframe id="-iframe" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+  </div>
+  <div class="button" id="wc-sns-google-plus">
+    <iframe id="-iframe" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+  </div>
+</div>
+
+<div id="wc-browser-support" hidden>
+  <div class="container">
+    <div class="alert alert-block alert-error">
+      <h4 data-l10n-id="browser-support-title"></h4>
+      <span data-l10n-id="browser-support-message"></span>
+    </div>
+  </div>
+</div>

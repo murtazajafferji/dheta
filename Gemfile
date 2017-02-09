@@ -22,7 +22,6 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-gem 'bootstrap', '~> 4.0.0.alpha3.1'
 gem 'high_voltage'
 gem 'pg'
 group :development do
@@ -30,3 +29,7 @@ group :development do
   gem 'hub', :require=>nil
   gem 'rails_layout'
 end
+
+gem 'tiny_tds'
+gem 'activerecord-sqlserver-adapter'
+gem "delayed_job_active_record"

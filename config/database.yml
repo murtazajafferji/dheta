@@ -12,6 +12,7 @@
 # Configure Using Gemfile
 # gem 'pg'
 #
+
 development:
   adapter:  postgresql
   host:     localhost
@@ -21,6 +22,16 @@ development:
   username: dheta
   password:
   template: template0
+
+#development:
+#  adapter:  sqlserver
+#  host: jafferji.database.windows.net
+#  database: dheta_production
+#  port: 1433
+#  username: <%= ENV['SQL_USERNAME'] %>
+#  password: <%= ENV['SQL_PASSWORD'] %>
+#  timeout: 5000
+#  azure: true
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -51,11 +62,12 @@ test:
   template: template0
 
 production:
-  adapter:  postgresql
-  host:     localhost
-  encoding: unicode
+  adapter:  sqlserver
+  mode: dblib
+  host: jafferji.database.windows.net
   database: dheta_production
-  pool:     5
-  username: dheta
-  password:
-  template: template0
+  port: 1433
+  username: <%= ENV['SQL_USERNAME'] %>
+  password: <%= ENV['SQL_PASSWORD'] %>
+  timeout: 5000
+  azure: true
