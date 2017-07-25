@@ -35,6 +35,10 @@
   <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/word_cloud/assets/wordcloud.css">
 
+  <!-- timeline -->
+  <link rel="stylesheet" type="text/css" href="/libraries/vis.min.css">
+  <!-- end timeline -->
+
   <link rel="prefetch" type="application/l10n" href="/word_cloud/locales/locales.ini?_=@@timestamp" />
 
   <link rel="payment" href="https://flattr.com/submit/auto?url=https%3A%2F%2Fgithub.com%2Ftimdream%2Fwordcloud&amp;user_id=timdream" type="text/html" />
@@ -59,9 +63,32 @@
   <%= javascript_include_tag "/word_cloud/assets/start.js" , defer: 'defer' %>
   <!-- endbuild -->
 
+  <!-- timeline -->
+  <%= javascript_include_tag "/libraries/vis.min.js" %>
+  <!-- end timeline -->
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('timeline');
+
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(<%= @timeline %>);
+
+    // Configuration for the Timeline
+    var options = {};
+
+    // Create a Timeline
+    var timeline = new vis.Timeline(container, items, options);
+  });
+</script>
+
 <% end %>
 
 <div id="dheta-text" style="display: none;"><%= @text %></div>
+
+<div id="timeline"></div>
+
 <div id="wc-canvas-container">
   <div id="wc-canvas">
     <canvas id="wc-canvas-canvas"></canvas>
@@ -322,15 +349,6 @@ There is also a <a href="http://timdream.org/wordcloud2.js/">page</a> available 
   </div>
   <div class="modal-footer">
     <button data-l10n-id="about-dialog-close-btn" id="wc-about-close-btn" class="btn btn-primary"></button>
-  </div>
-</div>
-
-<div id="wc-sns-push" hidden>
-  <div class="button" id="wc-sns-facebook">
-    <iframe id="-iframe" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-  </div>
-  <div class="button" id="wc-sns-google-plus">
-    <iframe id="-iframe" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
   </div>
 </div>
 

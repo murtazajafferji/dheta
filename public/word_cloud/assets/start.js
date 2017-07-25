@@ -1,7 +1,7 @@
 'use strict';
 
 /* global WordFreq:true, WordFreqSync:true, WordCloudApp,
-          LanguageSwitcherView, SNSPushView, CanvasView,
+          LanguageSwitcherView, CanvasView,
           LoadingView, DashboardView, ListDialogView,
           SharerDialogView, AboutDialogView, SourceDialogView,
           ExamplePanelView, CPPanelView, FilePanelView,
@@ -59,8 +59,6 @@ window.onerror = function onerror(message, url, line) {
   var langSwitcherView = new LanguageSwitcherView();
   langSwitcherView.app = app;
 
-  var snsPushView = new SNSPushView();
-  snsPushView.show();
 
   var psmView = new PSMView();
   psmView.show();

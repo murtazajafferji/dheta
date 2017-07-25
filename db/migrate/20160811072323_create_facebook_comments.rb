@@ -8,6 +8,9 @@ class CreateFacebookComments < ActiveRecord::Migration[5.0]
       t.string        :comment_author
       t.datetime      :comment_published_at
       t.integer       :comment_likes
+      t.string        :offensive_words
+      t.string        :comment_message_without_stopwords
+      t.integer        :offensive_class
 
       t.timestamps
     end

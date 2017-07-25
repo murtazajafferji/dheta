@@ -382,10 +382,16 @@ DhetaFetcher.prototype.stop = function tf_stop() {
   clearTimeout(this.timer);
 };
 DhetaFetcher.prototype.getData = function tf_getData(dataType, data) {
-  data = $('#dheta-text').text();
+  var scores = JSON.parse($('#dheta-text').text());
+  var vol = 0;
+  var list = [];
+  for (var key in scores) {
+    vol += key.length * scores[key] * scores[key];
+    list.push([key, scores[key]]);
+  };
 
   // Make sure we call the handler methods as async callback.
-  this.timer = setTimeout((function tf_gotData() {
-    this.app.handleData(data);
+  this.timer = setTimeout((function bf_gotData() {
+    this.app.handleList(list, vol);
   }).bind(this), 0);
 };

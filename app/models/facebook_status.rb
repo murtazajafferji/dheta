@@ -1,7 +1,8 @@
 class FacebookStatus < ActiveRecord::Base
   self.primary_key = 'facebook_status_id'
   has_many :facebook_comments
-
+  has_many :segments, as: :segmentable, dependent: :destroy
+  @scrape_page_limit = 5
   #FacebookStatus.scrape_facebook_page_feed_status('breitbart')
 
   def self.request_until_succeed(url)
@@ -23,7 +24,7 @@ class FacebookStatus < ActiveRecord::Base
     open(url).read
   end
 
-  def self.get_facebook_page_feed_data(page_id, num_statuses)
+  def self.get_facebook_page_feed_data(page_id, num_statuses, status_since = nil, status_until = nil)
 
     # Construct the URL string; see http://stackoverflow.com/a/37239851 for
     # Reactions parameters
@@ -32,7 +33,7 @@ class FacebookStatus < ActiveRecord::Base
     fields = "/?fields=message,link,created_time,type,name,id," +
             "comments.limit(0).summary(true),shares,reactions" +
             ".limit(0).summary(true)"
-    parameters = "&limit=#{num_statuses}&access_token=#{ENV['FACEBOOK_APP_ID'] + "|" + ENV['FACEBOOK_APP_SECRET']}"
+    parameters = "&limit=#{num_statuses}#{status_since ? "&since=#{status_since}" : ''}#{status_until ? "&until=#{status_until}" : ''}&access_token=#{ENV['FACEBOOK_APP_ID'] + "|" + ENV['FACEBOOK_APP_SECRET']}"
     url = base + node + fields + parameters
 
     # retrieve data
@@ -126,7 +127,7 @@ class FacebookStatus < ActiveRecord::Base
                           "status_published_at" => status_published, "num_reactions" => num_reactions, "num_comments" => num_comments,
                           "num_shares" => num_shares, "num_likes" => num_likes, "num_loves" => num_loves, "num_wows" => num_wows,
                           "num_hahas" => num_hahas, "num_sads" => num_sads, "num_angrys" => num_angrys}
-    puts a
+    #puts a
     
     FacebookStatus.create(facebook_status_id: status_id, facebook_page_id: page_id, status_message: status_message, 
                           link_name: link_name, status_type: status_type, status_link: status_link,
@@ -143,33 +144,60 @@ class FacebookStatus < ActiveRecord::Base
     scrape_starttime = DateTime.now
 
     puts "Scraping #{page_id} Facebook Page: #{scrape_starttime}\n"
+    current_segment = Segment.new(segmentable: page, end_time: DateTime.now.to_time.to_s) 
+    segments = Segment.where(segmentable: page).order('end_time DESC')
+    page_until = nil
 
-    statuses = get_facebook_page_feed_data(page_id, 100)
+    begin
+      # TODO: Make this more efficient by passing in the end time as the start of the next segment if it's within range
+      statuses = get_facebook_page_feed_data(page_id, @scrape_page_limit, current_segment.start_time, nil)
+      while has_next_page
+        statuses['data'].each do |status|
 
-    while has_next_page
-      statuses['data'].each do |status|
+          # Ensure it is a status with the expected metadata
+          if status['reactions']
+              process_facebook_page_feed_status(status, page_id)
+          end
 
-        # Ensure it is a status with the expected metadata
-        if status['reactions']
-            process_facebook_page_feed_status(status, page_id)
+          # output progress occasionally to make sure code is not
+          # stalling
+          num_processed += 1
+          if num_processed % 100 == 0
+              puts "#{num_processed} Statuses Processed: #{DateTime.now}"
+          end
         end
 
-        # output progress occasionally to make sure code is not
-        # stalling
-        num_processed += 1
-        if num_processed % 100 == 0
-            puts "#{num_processed} Statuses Processed: #{DateTime.now}"
-        end
-      end
+        # if there is no next page, we're done.
+        if statuses['paging']
+          current_segment.start_time = page_until
+          current_segment.save
+          page.save # Save only after we have processed the statuses, so do not move this below
 
-      # if there is no next page, we're done.
-      if statuses['paging']
-        statuses = JSON.parse(request_until_succeed(
-                                statuses['paging']['next']))
-      else
-        has_next_page = false
+          if statuses['paging']['next']
+            # Merge segment with next segment if the start time for the next segment is greater than or equal to the end time for the current segment
+            if segments.count > 1 and current_segment.start_time and segments[1].end_time >= current_segment.start_time
+              current_segment.start_time = segments[1].start_time
+              segments[1].destroy
+            end 
+
+            page_until = DateTime.strptime(CGI.parse(URI.parse(statuses['paging']['next']).query)['until'].first, '%s')
+            page_since = DateTime.strptime(CGI.parse(URI.parse(statuses['paging']['previous']).query)['since'].first, '%s')
+
+            statuses = JSON.parse(request_until_succeed(statuses['paging']['next']))          
+          else
+            has_next_page = false
+            current_segment.end_reached = true
+            current_segment.save
+          end
+        else
+          has_next_page = false
+          current_segment.end_reached = true
+          current_segment.save
+        end
+
+        segments = Segment.where(segmentable: page).order('end_time DESC')
       end
-    end
+    end while !current_segment.end_reached
 
     puts "\nDone!\n#{num_processed} Statuses Processed in #{DateTime.now - scrape_starttime}"
   end

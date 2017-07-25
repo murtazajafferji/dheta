@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160811072323) do
+ActiveRecord::Schema.define(version: 20160811072324) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,8 +43,11 @@ ActiveRecord::Schema.define(version: 20160811072323) do
     t.string   "comment_author"
     t.datetime "comment_published_at"
     t.integer  "comment_likes"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.string   "offensive_words"
+    t.string   "comment_message_without_stopwords"
+    t.integer  "offensive_class"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.index ["facebook_status_id"], name: "index_facebook_comments_on_facebook_status_id", using: :btree
     t.index ["parent_id"], name: "index_facebook_comments_on_parent_id", using: :btree
   end
@@ -75,6 +78,17 @@ ActiveRecord::Schema.define(version: 20160811072323) do
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
     t.index ["facebook_page_id"], name: "index_facebook_statuses_on_facebook_page_id", using: :btree
+  end
+
+  create_table "segments", force: :cascade do |t|
+    t.string   "segmentable_id"
+    t.string   "segmentable_type"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.boolean  "beginning_reached"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+    t.index ["segmentable_type", "segmentable_id"], name: "index_segments_on_segmentable_type_and_segmentable_id", using: :btree
   end
 
 end

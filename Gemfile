@@ -33,3 +33,7 @@ end
 gem 'tiny_tds'
 gem 'activerecord-sqlserver-adapter'
 gem "delayed_job_active_record"
+
+#gem 'liblinear-ruby'
+gem 'classifier-reborn'
+gem 'uea-stemmer'

@@ -1,0 +1,20 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+MiroClient	ml/classifier.py	/^from miro.client import MiroClient$/;"	kind:namespace	line:5
+api_key	ml/classifier.py	/^    api_key="API_KEY",$/;"	kind:variable	line:17
+classifier.py	ml/classifier.py	1;"	kind:file	line:1
+client	ml/classifier.py	/^client = MiroClient($/;"	kind:variable	line:15
+final_pipeline	ml/classifier.py	/^final_pipeline = client.fit(X, y,$/;"	kind:variable	line:21
+frac_valid	ml/classifier.py	/^                            frac_valid=0.20,$/;"	kind:variable	line:22
+iterations	ml/classifier.py	/^                            iterations=25,$/;"	kind:variable	line:23
+load_iris	ml/classifier.py	/^from sklearn.datasets import load_iris$/;"	kind:namespace	line:2
+max_time_sec	ml/classifier.py	/^    max_time_sec=60,$/;"	kind:variable	line:18
+np	ml/classifier.py	/^import numpy as np$/;"	kind:namespace	line:1
+num_classes	ml/classifier.py	/^                            num_classes=num_classes)$/;"	kind:variable	line:24
+num_classes	ml/classifier.py	/^num_classes = np.unique(y).shape[0]$/;"	kind:variable	line:10
+train_test_split	ml/classifier.py	/^from sklearn.model_selection import train_test_split$/;"	kind:namespace	line:3
+y	ml/classifier.py	/^y = y.reshape((y.shape[0], 1))$/;"	kind:variable	line:9
