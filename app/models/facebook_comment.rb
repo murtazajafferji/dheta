@@ -107,11 +107,13 @@ class FacebookComment < ActiveRecord::Base
                           comment_published_at: comment_published, comment_likes: comment_likes)
   end
 
-  def self.scrape_facebook_page_feed_comments(page_id)
+  def self.scrape_facebook_page_feed_comments(page_id, limit=nil)
     num_processed = 0   # keep a count on how many we've processed
     scrape_starttime = DateTime.now
 
     puts "Scraping #{page_id} Comments From Posts: #{scrape_starttime}\n"
+
+    scraped_page_count = 0
 
     # Get statuses without comments
     statuses = FacebookStatus.includes(:facebook_comments).where(facebook_page_id: page_id, facebook_comments: { facebook_status_id: nil })
@@ -175,6 +177,10 @@ class FacebookComment < ActiveRecord::Base
         else
           has_next_page = false
         end
+      end
+      scraped_page_count += 1
+      if scraped_page_count >= limit
+        break
       end
     end
 

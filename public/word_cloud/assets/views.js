@@ -47,49 +47,6 @@ View.prototype.hide = function v_hide(currentState, nextState) {
   return true;
 };
 
-var LanguageSwitcherView = function LanguageSwitcher(opts) {
-  this.load(opts, {
-    element: 'wc-language'
-  });
-
-  var defaultLanguage = navigator.language || navigator.userLanguage;
-  defaultLanguage = defaultLanguage.replace(/-[a-z]{2}$/i, function(str) {
-    return str.toUpperCase();
-  });
-
-  // Collect the information about available languages from HTML.
-  var langs = this.langs = [];
-  Array.prototype.forEach.call(this.element.children, function lang(el) {
-    langs.push(el.value);
-    if (el.value === defaultLanguage) {
-      el.selected = true;
-    }
-  });
-
-  if (langs.indexOf(defaultLanguage) === -1) {
-    // Default to the first one.
-    this.element.selectedIndex = 0;
-  }
-
-  // 'localized' is a CustomEvent dispatched by l10n.js
-  document.addEventListener('localized', this);
-  this.element.addEventListener('change', this);
-};
-LanguageSwitcherView.prototype = new View();
-LanguageSwitcherView.prototype.handleEvent = function lsv_handleEvent(evt) {
-  switch (evt.type) {
-    case 'change':
-      document.webL10n.setLanguage(this.element.value);
-      this.app.logAction('LanguageSwitcherView::change', this.element.value);
-      break;
-
-    case 'localized':
-      this.app.logAction('LanguageSwitcherView::localized',
-                          document.documentElement.lang);
-      break;
-  }
-};
-
 var LoadingView = function LoadingView(opts) {
   this.load(opts, {
     name: 'loading',
@@ -282,40 +239,4 @@ AboutDialogView.prototype.handleEvent = function adv_handleEvent(evt) {
 };
 AboutDialogView.prototype.close = function adv_close() {
   this.app.switchUIState(this.app.UI_STATE_SOURCE_DIALOG);
-};
-
-var PSMView = function PSMView(opts) {
-  this.load(opts, {
-    name: 'psm',
-    element: 'wc-psm'
-  });
-
-  if (document.webL10n.getReadyState() === 'complete') {
-    this.loadFrame();
-  }
-  window.addEventListener('localized', this);
-};
-PSMView.prototype = new View();
-PSMView.prototype.URL = '//timdream.org/psm/#locale=%lang';
-PSMView.prototype.loadFrame = function pv_loadFrame() {
-  var lang = document.documentElement.lang;
-  var container = this.element;
-  while (container.firstElementChild) {
-    container.removeChild(container.firstElementChild);
-  }
-
-  var iframe = document.createElement('iframe');
-  iframe.src = this.URL.replace(/%lang/, lang);
-  iframe.setAttribute('scrolling', 'no');
-  iframe.setAttribute('frameborder', '0');
-  iframe.setAttribute('allowTransparency', 'true');
-  container.appendChild(iframe);
-};
-PSMView.prototype.handleEvent = function pv_handleEvent(evt) {
-  switch (evt.type) {
-    case 'localized':
-      this.loadFrame();
-
-      break;
-  }
 };

@@ -53,227 +53,24 @@ ExamplePanelView.prototype.submit = function epv_submit() {
   }
 };
 
-var CPPanelView = function CPPanelView(opts) {
+var FacebookPanelView = function FacebookPanelView(opts) {
   this.load(opts, {
-    name: 'cp',
-    element: 'wc-panel-cp',
-    textareaElement: 'wc-panel-cp-textarea'
+    name: 'facebook',
+    element: 'wc-panel-facebook',
+    inputElement: 'wc-panel-facebook-title'
   });
 };
-CPPanelView.prototype = new PanelView();
-CPPanelView.prototype.submit = function cpv_submit() {
-  var el = this.textareaElement;
-
-  if (!el.value.length) {
-    // maybe a warning here?
-    return;
-  }
-
-  var submitted;
-
-  if (window.btoa) {
-    // Protect the encoded string with base64 to workaround Safari bug,
-    // which improve sharability of the URL.
-    submitted = this.dialog.submit(
-      '#base64:' + window.btoa(unescape(encodeURIComponent(el.value))));
-  } else {
-    submitted = this.dialog.submit('#text:' + encodeURIComponent(el.value));
-  }
-
-  if (!submitted) {
-    // The hash is too long and is being rejected in IE.
-    // let's use the short hash instead.
-    this.dialog.submit('#text');
-  }
-};
-
-var FilePanelView = function FilePanelView(opts) {
-  this.load(opts, {
-    name: 'file',
-    element: 'wc-panel-file',
-    fileElement: 'wc-panel-file-file',
-    fileLabelElement: 'wc-panel-file-file-label',
-    encodingElement: 'wc-panel-file-encoding'
-  });
-
-  if (!this.isSupported) {
-    return;
-  }
-
-  var count = this.fileElement.files.length;
-  this.updateLabel(count);
-  this.fileElement.addEventListener('change', this);
-};
-FilePanelView.prototype = new PanelView();
-FilePanelView.prototype.handleEvent = function fpv_handleEvent(evt) {
-  var count = this.fileElement.files.length;
-  this.updateLabel(count);
-};
-FilePanelView.prototype.updateLabel = function fpv_updateLabel(count) {
-  this.fileLabelElement.setAttribute('data-l10n-args', '{ "n": ' + count + '}');
-  __(this.fileLabelElement);
-};
-FilePanelView.prototype.isSupported = !!window.FileReader;
-FilePanelView.prototype.submit = function fpv_submit() {
-  var el = this.fileElement;
-
-  if (!el.files.length) {
-    // maybe a warning here?
-    return;
-  }
-
-  var file = el.files[0];
-  if (file.type !== 'text/plain') {
-    alert(_('plain-text-file-please'));
-    return;
-  }
-
-  this.dialog.submit('#file');
-};
-
-var WikipediaPanelView = function WikipediaPanelView(opts) {
-  this.load(opts, {
-    name: 'wikipedia',
-    element: 'wc-panel-wikipedia',
-    inputElement: 'wc-panel-wikipedia-title'
-  });
-};
-WikipediaPanelView.prototype = new PanelView();
-WikipediaPanelView.prototype.submit = function wpv_submit() {
+FacebookPanelView.prototype = new PanelView();
+FacebookPanelView.prototype.submit = function wpv_submit() {
   var el = this.inputElement;
 
   if (!el.value) {
     return;
   }
 
-  // XXX maybe provide a <select> of largest Wikipedias here.
+  // XXX maybe provide a <select> of largest Facebooks here.
   // (automatically from this table or manually)
-  // https://meta.wikimedia.org/wiki/List_of_Wikipedias/Table
-  var lang = document.webL10n.getLanguage().substr(0, 2);
+  // https://meta.wikimedia.org/wiki/List_of_Facebooks/Table
 
-  this.dialog.submit('#wikipedia.' + lang + ':' + el.value);
-};
-
-var GooglePlusPanelView = function GooglePlusPanelView(opts) {
-  this.load(opts, {
-    name: 'googleplus',
-    element: 'wc-panel-googleplus',
-    statusElement: 'wc-panel-googleplus-status',
-    idElement: 'wc-panel-googleplus-id'
-  });
-
-  this.stringIds = [
-    'google-ready',
-    'google-start-to-login'
-  ];
-
-  this.loaded = false;
-};
-GooglePlusPanelView.prototype = new PanelView();
-GooglePlusPanelView.prototype.LABEL_LOGGED_IN = 0;
-GooglePlusPanelView.prototype.LABEL_NOT_LOGGED_IN = 1;
-GooglePlusPanelView.prototype.beforeShow = function gppv_beforeShow() {
-  PanelView.prototype.beforeShow.apply(this, arguments);
-
-  if (!GOOGLE_CLIENT_ID) {
-    throw 'No GOOGLE_CLIENT_ID defined.';
-  }
-
-  if (this.loaded) {
-    return;
-  }
-
-  this.loaded = true;
-
-  var el = document.createElement('script');
-  el.src = './assets/go2/src/google-oauth2.js?_=@@timestamp';
-  el.onload = el.onerror = (function go2load() {
-    el.onload = el.onerror = null;
-
-    if (!window.GO2) {
-      this.loaded = false;
-      return;
-    }
-
-    var redirectUri = window.GO2_REDIRECT_URI ||
-      document.location.href.replace(/\/(index.html)?(#.*)?$/i,
-                                     '/go2-redirect.html');
-
-    var go2 = this.go2 = new GO2({
-      clientId: GOOGLE_CLIENT_ID,
-      scope: this.GOOGLE_API_SCOPE || '',
-      redirectUri: redirectUri
-    });
-
-    go2.login(false, true);
-
-    // Update UI for the first time, as we might not
-    // be able to log-in quietly.
-    this.updateUI();
-
-    go2.onlogin = (function go2_onlogin(token) {
-      this.accessToken = token;
-      this.updateUI();
-
-      if (this.submitted) {
-        this.submitted = false;
-
-        // XXX: There is no way to cancel the login pop-up midway if
-        // the user navigates away from the panel (or the source dialog).
-        // We shall do some checking here to avoid accidently switches the UI.
-        if (this.element.hasAttribute('hidden') ||
-            this.dialog.element.hasAttribute('hidden')) {
-          return;
-        }
-
-        this.realSubmit();
-      }
-    }).bind(this);
-
-    go2.onlogout = (function go2_onlogout() {
-      this.accessToken = '';
-      this.updateUI();
-    }).bind(this);
-  }).bind(this);
-
-  document.documentElement.firstElementChild.appendChild(el);
-};
-GooglePlusPanelView.prototype.isReadyForFetch =
-  function gppv_isReadyForFetch() {
-    return !!this.accessToken;
-  };
-GooglePlusPanelView.prototype.updateUI = function gppv_updateUI() {
-  if (this.isReadyForFetch()) {
-    this.statusElement.setAttribute(
-      'data-l10n-id', this.stringIds[this.LABEL_LOGGED_IN]);
-  } else {
-    this.statusElement.setAttribute(
-      'data-l10n-id', this.stringIds[this.LABEL_NOT_LOGGED_IN]);
-  }
-  __(this.statusElement);
-};
-GooglePlusPanelView.prototype.submit = function gppv_submit() {
-  if (!window.GO2 || !this.loaded) {
-    return;
-  }
-
-  if (!this.isReadyForFetch()) {
-    this.submitted = true;
-    this.go2.login(true, false);
-
-    return;
-  }
-
-  this.realSubmit();
-};
-GooglePlusPanelView.prototype.realSubmit = function gppv_realSubmit() {
-  var id = this.idElement.value;
-  if (!id) {
-    id = 'me';
-  }
-
-  // Remove everything after the first slash.
-  id = id.replace(/\/.*$/, '');
-
-  this.dialog.submit('#googleplus:' + id);
+  this.dialog.submit('#facebook:' + el.value);
 };

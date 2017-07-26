@@ -1,14 +1,13 @@
 'use strict';
 
 /* global WordFreq:true, WordFreqSync:true, WordCloudApp,
-          LanguageSwitcherView, CanvasView,
+          CanvasView,
           LoadingView, DashboardView, ListDialogView,
           SharerDialogView, AboutDialogView, SourceDialogView,
-          ExamplePanelView, CPPanelView, FilePanelView,
-          WikipediaPanelView, GooglePlusPanelView,
+          ExamplePanelView, CPPanelView,
+          FacebookPanelView,
           TextFetcher, FileFetcher,
-          ListFetcher, COSCUPFetcher, WikipediaFetcher,
-          GooglePlusFetcher, PSMView */
+          ListFetcher, FacebookFetcher */
 
 window.onerror = function onerror(message, url, line) {
   _gaq.push(['_trackEvent',
@@ -56,13 +55,6 @@ window.onerror = function onerror(message, url, line) {
     return;
   }
 
-  var langSwitcherView = new LanguageSwitcherView();
-  langSwitcherView.app = app;
-
-
-  var psmView = new PSMView();
-  psmView.show();
-
   app.addView(new CanvasView());
   app.addView(new LoadingView());
   app.addView(new DashboardView());
@@ -74,16 +66,9 @@ window.onerror = function onerror(message, url, line) {
   app.addView(sourceDialogView);
 
   sourceDialogView.addPanel(new ExamplePanelView());
-  sourceDialogView.addPanel(new CPPanelView());
-  sourceDialogView.addPanel(new FilePanelView());
-  sourceDialogView.addPanel(new WikipediaPanelView());
-  sourceDialogView.addPanel(new GooglePlusPanelView());
+  sourceDialogView.addPanel(new FacebookPanelView());
 
   app.addFetcher(new TextFetcher());
-  app.addFetcher(new FileFetcher());
   app.addFetcher(new ListFetcher());
-  app.addFetcher(new COSCUPFetcher());
-  app.addFetcher(new WikipediaFetcher());
-  app.addFetcher(new GooglePlusFetcher());
-  app.addFetcher(new DhetaFetcher());
+  app.addFetcher(new FacebookFetcher());
 })();

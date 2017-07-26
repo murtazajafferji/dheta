@@ -1,6 +1,6 @@
 
 <% content_for :head do %>
-  <title>HTML5 Word Cloud</title>
+  <title>Dheta: Exposing Hate</title>
 
   <meta name="apple-mobile-web-app-title" content="Word Cloud">
   <link rel="apple-touch-icon-precomposed" href="/word_cloud/assets/images/wordcloud-logo.png" />
@@ -9,8 +9,8 @@
   <meta property="og:description" content="Get the most frequent terms in an tag cloud representation, powered by HTML5." />
 
   <!-- Unfortunately we need to hard-code these in HTML -->
-  <meta property="og:url" content="http://timdream.org/wordcloud/" />
-  <meta property="og:title" content="HTML5 Word Cloud" />
+  <meta property="og:url" content="http://dheta.com" />
+  <meta property="og:title" content="Dheta: Exposing Hate" />
   <meta property="fb:admins" content="541998202" />
   <meta property="fb:app_id" content="336016770126298" /><!-- Set correctly -->
 
@@ -36,7 +36,7 @@
   <link rel="stylesheet" type="text/css" href="/word_cloud/assets/wordcloud.css">
 
   <!-- timeline -->
-  <link rel="stylesheet" type="text/css" href="/libraries/vis.min.css">
+  <link rel="stylesheet" type="text/css" href="/word_cloud/assets/vis.min.css">
   <!-- end timeline -->
 
   <link rel="prefetch" type="application/l10n" href="/word_cloud/locales/locales.ini?_=@@timestamp" />
@@ -64,10 +64,10 @@
   <!-- endbuild -->
 
   <!-- timeline -->
-  <%= javascript_include_tag "/libraries/vis.min.js" %>
+  <%= javascript_include_tag "/word_cloud/assets/vis.min.js", defer: 'defer' %>
   <!-- end timeline -->
 
-<script type="text/javascript">
+<!--<script type="text/javascript">
   $(document).ready(function(){
     // DOM element where the Timeline will be attached
     var container = document.getElementById('timeline');
@@ -81,13 +81,11 @@
     // Create a Timeline
     var timeline = new vis.Timeline(container, items, options);
   });
-</script>
+</script>-->
 
 <% end %>
 
-<div id="dheta-text" style="display: none;"><%= @text %></div>
-
-<div id="timeline"></div>
+<!--<div id="timeline"></div>-->
 
 <div id="wc-canvas-container">
   <div id="wc-canvas">
@@ -122,15 +120,7 @@
           </li>
 
           <li hidden>
-            <a href="#" data-l10n-id="source-wikipedia" data-panel="wikipedia"></a></li>
-
-          <li hidden>
-            <a href="#" data-l10n-id="source-googleplus" data-panel="googleplus"></a></li>
-
-          <li hidden>
-            <a href="#" data-l10n-id="source-cp" data-panel="cp"></a></li>
-          <li hidden>
-            <a href="#" data-l10n-id="source-file" data-panel="file"></a></li>
+            <a href="#" data-l10n-id="source-facebook" data-panel="facebook"></a></li>
         </ul>
       </div>
       <div id="wc-source-panels" class="span9">
@@ -142,79 +132,31 @@
           </div>
 
           <div class="alert alert-block alert-info only-en-US">
-            <h4>How can I get my own world cloud?</h4>
-            <p>Unfortunately, Google and Facebook has closed their API services.
-Word Cloud can no longer access your data without these services.</p>
-            <p>In the meantime, you could supply text or file directly on the left.
-There is also a <a href="http://timdream.org/wordcloud2.js/">page</a> available for fine-grain control.</p>
-          </div>
-
-          <div class="alert alert-block alert-info only-zh-TW">
-            <h4>如何製作我自己的文字雲？</h4>
-            <p>很遺憾的，Google 和 Facebook 關閉了文字雲需要的 API 服務。文字雲無法直接抓取您的資料。</p>
-            <p>您可以改使用右方的選項直接提供文字或檔案給文字雲。<a href="http://timdream.org/wordcloud2.js/">有另一個網頁</a>可以提供進階使用者自訂文字雲。</p>
+            <h4>What is this?</h4>
+            <p>We created a machine learning model to detect when insults were used. Using this model, 
+                we make a word cloud for all the comments with insults and compare it the word cloud for comments without insults</p>
           </div>
 
           <label class="radio only-en-US">
             <input type="radio" name="example"
-              value="wikipedia:Cloud">
-            <span data-l10n-id="panel-example-wikipedia-cloud"></span>
+              value="facebook:breitbart" checked="checked">
+            <span data-l10n-id="panel-example-facebook-breitbart"></span>
           </label>
-          <label class="radio only-zh-TW">
+          <label class="radio only-en-US">
             <input type="radio" name="example"
-              value="wikipedia.zh:雲">
-            <span data-l10n-id="panel-example-wikipedia-zh-cloud"></span>
+              value="facebook:cnn">
+            <span data-l10n-id="panel-example-facebook-cnn"></span>
           </label>
-
-          <div id="wc-psm" hidden></div>
         </form>
 
-        <form id="wc-panel-wikipedia" hidden>
-          <label data-l10n-id="panel-wikipedia" for="wc-panel-wikipedia-title"></label>
-          <input type="text" id="wc-panel-wikipedia-title" class="input-medium" />
+        <form id="wc-panel-facebook" hidden>
+          <label data-l10n-id="panel-facebook" for="wc-panel-facebook-title"></label>
+          <input type="text" id="wc-panel-facebook-title" class="input-medium" />
         </form>
-
-        <form id="wc-panel-cp" hidden>
-          <label data-l10n-id="panel-cp-label" for="wc-panel-cp-textarea"></label>
-          <textarea id="wc-panel-cp-textarea" class="input-block-level" rows="10"></textarea>
-          <span data-l10n-id="panel-cp-help" class="help-block"></span>
-        </form>
-
-        <form id="wc-panel-file" hidden>
-          <label data-l10n-id="panel-file-label" for="wc-panel-file-file"></label>
-          <a class="btn file-wrapper">
-            <span data-l10n-id="panel-file-browse"></span>
-            <input type="file" accept="text/plain" id="wc-panel-file-file">
-          </a><span data-l10n-id="n-file-selected" data-l10n-args='{ "n": 0 }' id="wc-panel-file-file-label"></span>
-          <span data-l10n-id="panel-file-help" class="help-block"></span>
-          <label data-l10n-id="panel-file-encoding" for="wc-panel-file-encoding"></label>
-          <input type="text" id="wc-panel-file-encoding" value="UTF-8">
-          <span data-l10n-id="panel-file-encoding-help" class="help-block"></span>
-        </form>
-
-        <form id="wc-panel-googleplus" hidden>
-          <label data-l10n-id="panel-googleplus-label" for="wc-panel-googleplus-id"></label>
-          <div class="input-prepend">
-            <span class="add-on">https://plus.google.com/</span>
-            <input type="text" id="wc-panel-googleplus-id" class="input-medium" placeholder="me" />
-          </div>
-          <span data-l10n-id="panel-googleplus-help" class="help-block"></span>
-          <p id="wc-panel-googleplus-status" data-l10n-id="loading"></p>
-        </form>
-
       </div>
     </div>
   </div>
   <div class="modal-footer">
-
-    <div data-l10n-id="language-title" class="input-prepend pull-left" title="Language">
-      <span class="add-on"><i class="icon-globe"></i></span>
-      <select id="wc-language" class="input-small">
-        <option value="en-US" selected>English</option>
-        <option value="zh-TW">正體中文</option>
-      </select>
-    </div>
-
     <button data-l10n-id="source-dialog-start-btn" id="wc-source-start-btn" class="btn btn-primary"></button>
   </div>
 </div>
@@ -227,7 +169,7 @@ There is also a <a href="http://timdream.org/wordcloud2.js/">page</a> available 
           <button data-l10n-id="dashboard-back-btn" data-action="back" class="btn" title="Back"><i class="icon-chevron-left"></i><span data-l10n-id="dashboard-back-span"></span></button>
         </div>
 
-        <div class="btn-group">
+        <!--<div class="btn-group">
           <button data-l10n-id="dashboard-refresh-btn" data-canvas-ctl data-action="refresh" class="btn disabled hide-label" title="Refresh"><i class="icon-refresh"></i><span data-l10n-id="dashboard-refresh-span"></span></button>
           <button data-l10n-id="dashboard-theme-btn" data-canvas-ctl data-action="theme" class="btn disabled" title="Switch Theme"><i class="icon-gift"></i><span data-l10n-id="dashboard-theme-span"></span></button>
           <button data-l10n-id="dashboard-shape-btn" data-canvas-ctl data-action="shape" class="btn disabled" title="Switch Shape"><i class="icon-star"></i><span data-l10n-id="dashboard-shape-span"></span></button>
@@ -242,7 +184,7 @@ There is also a <a href="http://timdream.org/wordcloud2.js/">page</a> available 
         <div class="btn-group">
           <button data-l10n-id="dashboard-disperse-btn" data-canvas-ctl data-action="gap+" class="btn disabled hide-label" title="Disperse"><i class="icon-resize-full"></i><span data-l10n-id="dashboard-disperse-span"></span></button>
           <button data-l10n-id="dashboard-gather-up-btn" data-canvas-ctl data-action="gap-" class="btn disabled hide-label" title="Gather Up"><i class="icon-resize-small"></i><span data-l10n-id="dashboard-gather-up-span"></span></button>
-        </div>
+        </div>-->
 
         <div class="pull-right">
 

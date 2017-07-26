@@ -136,8 +136,8 @@ class FacebookStatus < ActiveRecord::Base
                           num_hahas: num_hahas, num_sads: num_sads, num_angrys: num_angrys)
   end
 
-  def self.scrape_facebook_page_feed_status(page_id)
-    page = FacebookPage.first_or_create(facebook_page_id: page_id)
+  def self.scrape_facebook_page_feed_status(page_id, limit = nil)
+    page = FacebookPage.find_or_create_by(facebook_page_id: page_id)
     
     has_next_page = true
     num_processed = 0   # keep a count on how many we've processed
@@ -148,6 +148,7 @@ class FacebookStatus < ActiveRecord::Base
     segments = Segment.where(segmentable: page).order('end_time DESC')
     page_until = nil
 
+    scraped_page_count = 0
     begin
       # TODO: Make this more efficient by passing in the end time as the start of the next segment if it's within range
       statuses = get_facebook_page_feed_data(page_id, @scrape_page_limit, current_segment.start_time, nil)
@@ -186,18 +187,22 @@ class FacebookStatus < ActiveRecord::Base
             statuses = JSON.parse(request_until_succeed(statuses['paging']['next']))          
           else
             has_next_page = false
-            current_segment.end_reached = true
+            current_segment.beginning_reached = true
             current_segment.save
           end
         else
           has_next_page = false
-          current_segment.end_reached = true
+          current_segment.beginning_reached = true
           current_segment.save
         end
 
         segments = Segment.where(segmentable: page).order('end_time DESC')
+        scraped_page_count += 1 
+        if scraped_page_count >= limit
+          break
+        end
       end
-    end while !current_segment.end_reached
+    end while !current_segment.beginning_reached && scraped_page_count < limit
 
     puts "\nDone!\n#{num_processed} Statuses Processed in #{DateTime.now - scrape_starttime}"
   end

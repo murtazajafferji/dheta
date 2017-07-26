@@ -1,6 +1,6 @@
 'use strict';
 
-/* global WordCloud, FilePanelView, WordFreq, WordFreqSync,
+/* global WordCloud, WordFreq, WordFreqSync,
           FACEBOOK_APP_ID, FB, FACEBOOK_APP_ID */
 
 var WordCloudApp = function WordCloudApp() {
@@ -32,10 +32,6 @@ var WordCloudApp = function WordCloudApp() {
   this.logAction('WordCloudApp::isSupported::true');
 
   this.isFullySupported = (function checkFullySupport() {
-    if (!FilePanelView.prototype.isSupported) {
-      return false;
-    }
-
     // Check for real canvas.toBlob() method.
     if (window.HTMLCanvasElement.prototype.toBlob) {
       return true;
@@ -318,8 +314,8 @@ WordCloudApp.prototype.stopHandleData = function wca_stopHandleData() {
   }
   this.wordfreq = undefined;
 };
-WordCloudApp.prototype.handleList = function wca_handleList(list, vol) {
-  this.logAction('WordCloudApp::handleList', list.length);
+WordCloudApp.prototype.handleList = function wca_handleList(list, vol, title) {
+  this.logAction('WordCloudApp::handleList', title + ' (' + list.length + ')');
 
   if (!list.length) {
     this.switchUIState(this.UI_STATE_ERROR_WITH_DASHBOARD);
@@ -330,6 +326,7 @@ WordCloudApp.prototype.handleList = function wca_handleList(list, vol) {
 
   this.switchUIState(this.UI_STATE_DASHBOARD);
 
+  this.data.title = title;
   this.data.list = list;
   this.data.gridSize = 4;
   this.data.theme = Math.floor(Math.random() * this.themes.length);
