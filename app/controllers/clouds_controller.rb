@@ -12,7 +12,9 @@ class CloudsController < ApplicationController
       FacebookComment.process_comments
     end
     if page
-      @text = score(page.facebook_comments.where(offensive_class: 1).collect{|x| x.comment_message_without_stopwords.downcase }.join(' ').split(' ')).to_json.html_safe
+      map0 = score(page.facebook_comments.where(offensive_class: 0).collect{|x| x.comment_message_without_stopwords.downcase }.join(' ').split(' '))
+      map1 = score(page.facebook_comments.where(offensive_class: 1).collect{|x| x.comment_message_without_stopwords.downcase }.join(' ').split(' '))
+      @text = [map0, map1].to_json.html_safe
       #@text = score(page.facebook_comments.where.not(offensive_words: [nil, '']).collect{|x| x.offensive_words }.join(',').downcase.split(',')).to_json.html_safe
       #@text = score(page.facebook_comments.where.not(comment_message_without_stopwords: [nil, '']).collect{|x| x.comment_message_without_stopwords.downcase }.split(' ')).to_json.html_safe
     end

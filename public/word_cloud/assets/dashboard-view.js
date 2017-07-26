@@ -165,6 +165,17 @@ DashboardView.prototype.handleEvent = function dv_handleEvent(evt) {
     case 'share':
       app.showSharer();
 
+    case 'change':
+      if ($('.current-dataset-btn').hasClass('last')) {
+        $('.current-dataset-btn').removeClass('current-dataset-btn').hide();
+        $('.first').show().addClass('current-dataset-btn');
+      } else {
+        $('.current-dataset-btn').removeClass('current-dataset-btn').hide().next().show().addClass('current-dataset-btn');
+      }
+
+      app.currentFetcher.changeDataset();
+      break;
+
       break;
   }
 };

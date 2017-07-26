@@ -36,35 +36,33 @@
   <link rel="stylesheet" type="text/css" href="/word_cloud/assets/wordcloud.css">
 
   <!-- timeline -->
-  <link rel="stylesheet" type="text/css" href="/word_cloud/assets/vis.min.css">
+  <!--<link rel="stylesheet" type="text/css" href="/word_cloud/assets/vis.min.css">-->
   <!-- end timeline -->
 
   <link rel="prefetch" type="application/l10n" href="/word_cloud/locales/locales.ini?_=@@timestamp" />
-
-  <link rel="payment" href="https://flattr.com/submit/auto?url=https%3A%2F%2Fgithub.com%2Ftimdream%2Fwordcloud&amp;user_id=timdream" type="text/html" />
 
   <!-- For browser without Web Workers support, run the calculation
        on the main event loop with the worker script. -->
   <%= javascript_include_tag "/word_cloud/assets/lib/wordfreq/src/wordfreq.worker.js?_=@@timestamp" , defer: 'defer' %>
 
   <!-- build:js assets/app.min.js -->
-  <%= javascript_include_tag "/word_cloud/assets/vars.js" %>
-  <%= javascript_include_tag "/word_cloud/assets/lib/web-l10n/l10n.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/lib/wordfreq/src/wordfreq.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/lib/wordcloud2.js/src/wordcloud2.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/app.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/views.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/canvas-view.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/source-dialog-view.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/dashboard-view.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/sharer-dialog-view.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/panels.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/fetchers.js" , defer: 'defer' %>
-  <%= javascript_include_tag "/word_cloud/assets/start.js" , defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/vars.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/web-l10n/l10n.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/wordfreq/src/wordfreq.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/lib/wordcloud2.js/src/wordcloud2.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/app.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/views.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/canvas-view.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/source-dialog-view.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/dashboard-view.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/sharer-dialog-view.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/panels.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/fetchers.js", defer: 'defer' %>
+  <%= javascript_include_tag "/word_cloud/assets/start.js", defer: 'defer' %>
   <!-- endbuild -->
 
   <!-- timeline -->
-  <%= javascript_include_tag "/word_cloud/assets/vis.min.js", defer: 'defer' %>
+  <!--<%= javascript_include_tag "/word_cloud/assets/vis.min.js", defer: 'defer' %>-->
   <!-- end timeline -->
 
 <!--<script type="text/javascript">
@@ -169,6 +167,10 @@
           <button data-l10n-id="dashboard-back-btn" data-action="back" class="btn" title="Back"><i class="icon-chevron-left"></i><span data-l10n-id="dashboard-back-span"></span></button>
         </div>
 
+        <div class="btn-group">
+          <button data-l10n-id="dashboard-insult-btn" data-canvas-ctl data-action="change" class="btn disabled first current-dataset-btn" title="Show Insulting"><i class="icon-random"></i><span data-l10n-id="dashboard-insult-span"></span></button>
+          <button data-l10n-id="dashboard-neutral-btn" data-canvas-ctl data-action="change" class="btn disabled last" title="Show Neutral" style="display:none;"><i class="icon-random"></i><span data-l10n-id="dashboard-neutral-span"></span></button>
+        </div>
         <!--<div class="btn-group">
           <button data-l10n-id="dashboard-refresh-btn" data-canvas-ctl data-action="refresh" class="btn disabled hide-label" title="Refresh"><i class="icon-refresh"></i><span data-l10n-id="dashboard-refresh-span"></span></button>
           <button data-l10n-id="dashboard-theme-btn" data-canvas-ctl data-action="theme" class="btn disabled" title="Switch Theme"><i class="icon-gift"></i><span data-l10n-id="dashboard-theme-span"></span></button>
