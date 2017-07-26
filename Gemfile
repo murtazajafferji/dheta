@@ -30,7 +30,7 @@ group :development do
   gem 'rails_layout'
 end
 
-gem 'tiny_tds'
+gem 'tiny_tds', '~> 1.3.0'
 gem 'activerecord-sqlserver-adapter'
 gem "delayed_job_active_record"
 
