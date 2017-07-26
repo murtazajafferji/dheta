@@ -37,3 +37,4 @@ gem "delayed_job_active_record"
 #gem 'liblinear-ruby'
 gem 'classifier-reborn'
 gem 'uea-stemmer'
+gem 'yaml_db'

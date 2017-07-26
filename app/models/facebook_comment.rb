@@ -11,6 +11,7 @@ class FacebookComment < ActiveRecord::Base
 
   #FacebookComment.scrape_facebook_page_feed_comments('breitbart')
   #ActiveRecord::Base.logger = nil
+  #heroku run bundle exec rake db:data:load
 
   def self.request_until_succeed(url)
     #req = urllib2.Request(url)
